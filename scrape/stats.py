@@ -136,6 +136,7 @@ def compute_user_stats(db, users_collection_name, films_collection_name):
         count_with_year = 0
 
         # Process ALL interactions for genre, runtime, and year stats
+        language_freq = defaultdict(int)
         for interaction in all_interactions:
             film = films.get(interaction['film_id'])
             if not film:
@@ -156,6 +157,10 @@ def compute_user_stats(db, users_collection_name, films_collection_name):
                         if 'rating' in interaction:
                             genre_ratings[genre].append(interaction['rating'])
                 
+                language = film['metadata'].get('language')
+                if language:
+                    language_freq[language] += 1
+
                 # Runtime and year - for all interactions
                 year = film['metadata'].get('year')
                 if year:
@@ -494,7 +499,8 @@ def compute_user_stats(db, users_collection_name, films_collection_name):
                     'avg_runtime': avg_runtime,
                     'total_runtime': total_runtime if total_runtime > 0 else None,
                     'avg_year_watched': avg_year_watched,
-                    'correlation_stats': correlation_stats  # NEW: Added correlation statistics
+                    'correlation_stats': correlation_stats,  # NEW: Added correlation statistics
+                    'language_freq': dict(language_freq)
                 }
             }}
         )
