@@ -765,6 +765,15 @@ class LetterboxdScraper:
             backdrop_url = backdrop_div["data-backdrop"]
         metadata['backdrop_url'] = backdrop_url
 
+        # Extract Language
+        language = None
+        details_section = soup.select_one("div#tab-details")
+        if details_section:
+            language_link = details_section.select_one('a[href^="/films/language/"]')
+            if language_link:
+                language = language_link.get_text(strip=True)
+        metadata['language'] = language
+
         return metadata
     
     def scrape_films_data(self, films_collection_name: str, scrape_all_films: bool = False):
